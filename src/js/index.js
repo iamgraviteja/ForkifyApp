@@ -1,4 +1,5 @@
 import Search from "./models/Search";
+import Recipe from "./models/Recipe";
 import { elements, renderLoader, removeLoader } from './views/base';
 import * as searchView from './views/searchView';
 
@@ -12,6 +13,9 @@ import * as searchView from './views/searchView';
 
 const state = {};
 
+/**
+ * SEARCH CONTROLLER
+ */
 const searchControl = async () => {
 
     //get query
@@ -25,13 +29,19 @@ const searchControl = async () => {
         searchView.clearInput();
         searchView.clearRecRes();
         renderLoader(elements.searchRes);
-        //get search results
-        await state.search.recipeResults();
+        try {
+            //get search results
+            await state.search.recipeResults();
 
-        //Render results in UI
-        removeLoader();
-        searchView.renderResult(state.search.result);
-        //console.log(state.search.result);
+            //Render results in UI
+            removeLoader();
+            searchView.renderResult(state.search.result);
+            //console.log(state.search.result);
+        }
+        catch (err) {
+            alert(`Error in loading search results!`);
+            removeLoader();
+        }
     }
 };
 
@@ -49,12 +59,37 @@ elements.searchResPages.addEventListener('click', e => {
     }
 });
 
+/**
+ * RECIPE CONTROLLER
+ */
 
+const recipeControl = async () => {
 
+    //get ID from URL
+    const id = window.location.hash.replace('#', '');
+    if (id) {
+        console.log(id);
+        //Create recipe object
+        const recipe = new Recipe(id);
 
+        try {
+            //get recipe details
+            await recipe.getRecipe();
 
+            //cal. time and servings
+            recipe.calcServings();
+            recipe.calcTime();
 
+            //Upadate UI
+            console.log(recipe);
+        }
+        catch (err) {
+            alert(`Error in loading recipe!`);
+        }
+    }
+};
 
+['hashchange', 'load'].forEach(event => window.addEventListener(event, recipeControl));
 
 
 
