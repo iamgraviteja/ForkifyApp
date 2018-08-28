@@ -11,7 +11,7 @@ export default class Recipe {
             const res = await axios(`${proxy}http://food2fork.com/api/get?key=${key}&rId=${this.id}`);
             this.title = res.data.recipe.title;
             this.author = res.data.recipe.publisher;
-            this.img = res.data.recipe.image_url;
+            this.src = res.data.recipe.image_url;
             this.ingredients = res.data.recipe.ingredients;
             this.url = res.data.recipe.source_url;
         }
@@ -32,6 +32,7 @@ export default class Recipe {
     parseIngredients() {
         const longUnits = ['ounces', 'ounce', 'teaspoons', 'teaspoon', 'tablespoons', 'tablespoon', 'cups', 'pounds', 'inches'];
         const shortUnits = ['oz', 'oz', 'tsp', 'tsp', 'tbsp', 'tbsp', 'cup', 'pound', 'inch'];
+        const units = [...shortUnits, 'kg', 'g'];
         const newIngredients = this.ingredients.map(ing => {
             let ingredient = ing.trim().toLowerCase();
 
@@ -45,7 +46,7 @@ export default class Recipe {
 
             //Seperate unit and quantity
             const arrIng = ingredient.split(' ');
-            const unitIndex = arrIng.findIndex(el => shortUnits.includes(el));
+            const unitIndex = arrIng.findIndex(el => units.includes(el));
             let ingObj;
 
             if (unitIndex > -1) { //if unit and quantity is present
@@ -76,6 +77,21 @@ export default class Recipe {
         this.ingredients = newIngredients;
     }
 
+    updateServings(type) {
+        let updatedSer;
+        //Update servings
+        if (type === 'dec') {
+            updatedSer = this.servings - 1;
+        } else {
+            updatedSer = this.servings + 1;
+        }
+        //Update ingredients
+        this.ingredients.forEach(ing => {
+            ing.count *= (updatedSer / this.servings);
+        });
+        
+        this.servings = updatedSer;
+    }
 
 
 

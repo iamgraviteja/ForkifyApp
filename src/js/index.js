@@ -2,6 +2,7 @@ import Search from "./models/Search";
 import Recipe from "./models/Recipe";
 import { elements, renderLoader, removeLoader } from './views/base';
 import * as searchView from './views/searchView';
+import * as recipeView from './views/recipeView';
 
 /**
  * Global Store
@@ -69,23 +70,33 @@ const recipeControl = async () => {
     const id = window.location.hash.replace('#', '');
     if (id) {
         console.log(id);
+        //Prepare UI for result.
+        recipeView.clearRecipe();
+        renderLoader(elements.recipe);
+
+        //Highlight selected recipe
+        if (state.search) searchView.highlightSelRec(id);
+
         //Create recipe object
-        const recipe = new Recipe(id);
+        state.recipe = new Recipe(id);
 
         try {
             //get recipe details and parse ingredients
-            await recipe.getRecipe();
-            recipe.parseIngredients();
+            await state.recipe.getRecipe();
+            state.recipe.parseIngredients();
 
             //cal. time and servings
-            recipe.calcServings();
-            recipe.calcTime();
+            state.recipe.calcServings();
+            state.recipe.calcTime();
 
             //Upadate UI
-            console.log(recipe);
+            removeLoader();
+            recipeView.renderRecipe(state.recipe);
+            //console.log(state.recipe);
         }
         catch (err) {
             alert(`Error in loading recipe!`);
+            removeLoader();
         }
     }
 };
@@ -93,7 +104,18 @@ const recipeControl = async () => {
 ['hashchange', 'load'].forEach(event => window.addEventListener(event, recipeControl));
 
 
-
+elements.recipe.addEventListener('click', e => {
+    if (e.target.matches('.btn-decrease,.btn-decrease *')) {
+        if (state.recipe.servings > 1) {
+            state.recipe.updateServings('dec');
+            recipeView.updateServIng(state.recipe);
+        }
+    } else if (e.target.matches('.btn-increase,.btn-increase *')) {
+        state.recipe.updateServings('inc');
+        recipeView.updateServIng(state.recipe);
+    }
+    console.log(state.recipe);
+});
 
 
 

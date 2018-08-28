@@ -2,6 +2,14 @@ import { elements } from './base';
 
 export const getInput = () => elements.searchInput.value;
 
+export const highlightSelRec = (id) => {
+    const resArr = Array.from(document.querySelectorAll('.results__link'));
+    resArr.forEach(el => {
+        el.classList.remove('results__link--active');
+    });
+    document.querySelector(`a[href="#${id}"]`).classList.add('results__link--active');
+};
+
 export const clearInput = () => {
     elements.searchInput.value = '';
 };
