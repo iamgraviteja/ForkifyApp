@@ -73,8 +73,9 @@ const recipeControl = async () => {
         const recipe = new Recipe(id);
 
         try {
-            //get recipe details
+            //get recipe details and parse ingredients
             await recipe.getRecipe();
+            recipe.parseIngredients();
 
             //cal. time and servings
             recipe.calcServings();

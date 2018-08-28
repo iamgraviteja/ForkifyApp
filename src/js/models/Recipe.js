@@ -28,4 +28,55 @@ export default class Recipe {
     calcServings() {
         this.servings = 4;
     }
+
+    parseIngredients() {
+        const longUnits = ['ounces', 'ounce', 'teaspoons', 'teaspoon', 'tablespoons', 'tablespoon', 'cups', 'pounds', 'inches'];
+        const shortUnits = ['oz', 'oz', 'tsp', 'tsp', 'tbsp', 'tbsp', 'cup', 'pound', 'inch'];
+        const newIngredients = this.ingredients.map(ing => {
+            let ingredient = ing.trim().toLowerCase();
+
+            //Shorten units
+            longUnits.forEach((unit, i) => {
+                ingredient = ingredient.replace(unit, shortUnits[i]);
+            });
+
+            //Replace parentheses and content in it with blank space.
+            ingredient = ingredient.replace(/ *\([^)]*\) */g, ' ');
+
+            //Seperate unit and quantity
+            const arrIng = ingredient.split(' ');
+            const unitIndex = arrIng.findIndex(el => shortUnits.includes(el));
+            let ingObj;
+
+            if (unitIndex > -1) { //if unit and quantity is present
+                const count = arrIng.slice(0, unitIndex).join('+').replace('-', '+');
+                ingObj = {
+                    count: eval(count),
+                    unit: arrIng[unitIndex],
+                    ingredient: arrIng.slice(unitIndex + 1).join(' ')
+                }
+            }
+            else if (parseInt(arrIng[0], 10)) { //if quantity alone is present
+                ingObj = {
+                    count: parseInt(arrIng[0], 10),
+                    unit: '',
+                    ingredient: arrIng.slice(1).join(' ')
+                }
+            }
+            else if (unitIndex === -1) { //if no qty. and unit is present
+                ingObj = {
+                    count: 1,
+                    unit: '',
+                    ingredient
+                }
+            }
+
+            return ingObj;
+        });
+        this.ingredients = newIngredients;
+    }
+
+
+
+
 }
