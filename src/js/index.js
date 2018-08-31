@@ -1,8 +1,10 @@
 import Search from "./models/Search";
 import Recipe from "./models/Recipe";
+import List from "./models/List";
 import { elements, renderLoader, removeLoader } from './views/base';
 import * as searchView from './views/searchView';
 import * as recipeView from './views/recipeView';
+import * as listView from './views/listView';
 
 /**
  * Global Store
@@ -104,6 +106,41 @@ const recipeControl = async () => {
 ['hashchange', 'load'].forEach(event => window.addEventListener(event, recipeControl));
 
 
+/**
+ * LIST CONTROLLER
+ */
+
+const listControl = () => {
+    //create list if not present
+    if (!state.list) state.list = new List();
+
+    //add ingredients to the list
+    state.recipe.ingredients.forEach(el => {
+        const item = state.list.addItem(el.count, el.unit, el.ingredient);
+        listView.renderItem(item);
+    });
+};
+
+elements.shopping.addEventListener('click', e => {
+    const ID = e.target.closest('.shopping__item').dataset.itemid;
+
+    if (e.target.matches('.shopping__delete,.shopping__delete *')) {
+        //remove item from state
+        state.list.removeItem(ID);
+        //remove item from UI
+        listView.deleteItem(ID);
+    } else if (e.target.matches('.shopping__item-value')) {
+
+        //check for -ve value and update count
+        if (e.target.value >= 0) {
+            const newCount = parseInt(e.target.value, 10);
+            state.list.updateCount(ID, newCount);
+        }
+    }
+
+});
+
+
 elements.recipe.addEventListener('click', e => {
     if (e.target.matches('.btn-decrease,.btn-decrease *')) {
         if (state.recipe.servings > 1) {
@@ -113,10 +150,10 @@ elements.recipe.addEventListener('click', e => {
     } else if (e.target.matches('.btn-increase,.btn-increase *')) {
         state.recipe.updateServings('inc');
         recipeView.updateServIng(state.recipe);
+    } else if (e.target.matches('.recipe__btn-add,.recipe__btn-add *')) {
+        listControl();
     }
-    console.log(state.recipe);
 });
-
 
 
 
