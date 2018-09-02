@@ -15,7 +15,6 @@ import * as likesView from './views/likesView';
  * - Shopping list
  * - Liked recipes
  */
-
 const state = {};
 
 /**
@@ -41,7 +40,6 @@ const searchControl = async () => {
             //Render results in UI
             removeLoader();
             searchView.renderResult(state.search.result);
-            //console.log(state.search.result);
         }
         catch (err) {
             alert(`Error in loading search results!`);
@@ -67,13 +65,11 @@ elements.searchResPages.addEventListener('click', e => {
 /**
  * RECIPE CONTROLLER
  */
-
 const recipeControl = async () => {
 
     //get ID from URL
     const id = window.location.hash.replace('#', '');
     if (id) {
-        console.log(id);
         //Prepare UI for result.
         recipeView.clearRecipe();
         renderLoader(elements.recipe);
@@ -99,7 +95,6 @@ const recipeControl = async () => {
                 state.recipe,
                 state.likes.isLiked(id)
             );
-            //console.log(state.recipe);
         }
         catch (err) {
             alert(`Error in loading recipe!`);
@@ -114,7 +109,6 @@ const recipeControl = async () => {
 /**
  * LIST CONTROLLER
  */
-
 const listControl = () => {
     //create list if not present
     if (!state.list) state.list = new List();
@@ -148,11 +142,6 @@ elements.shopping.addEventListener('click', e => {
 /**
  * LIKES CONTROLLER
  */
-
-//TESTING
-state.likes = new Likes();
-likesView.toggleLikesMenu(state.likes.likesCount());
-
 const likesControl = () => {
 
     const recipeID = state.recipe.id;
@@ -173,7 +162,6 @@ const likesControl = () => {
         likesView.toggleLiked(true);
 
         //Update the like UI
-        console.log(state.likes);
         likesView.addLikeToList(newLike);
 
     }
@@ -189,6 +177,22 @@ const likesControl = () => {
     }
     likesView.toggleLikesMenu(state.likes.likesCount());
 };
+
+//Persistent Likes in localStorage
+window.addEventListener('load', () => {
+    state.likes = new Likes();
+
+    //render likes from localStorage
+    state.likes.readStorage();
+
+    //Toggle likes menu
+    likesView.toggleLikesMenu(state.likes.likesCount());
+
+    //Render the likes from storage
+    state.likes.likes.forEach(like => likesView.addLikeToList(like));
+
+});
+
 
 elements.recipe.addEventListener('click', e => {
     if (e.target.matches('.btn-decrease,.btn-decrease *')) {
