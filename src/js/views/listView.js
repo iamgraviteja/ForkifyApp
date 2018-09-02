@@ -15,10 +15,18 @@ export const renderItem = item => {
                     </button>
                 </li>
 `;
-    elements.shopping.insertAdjacentHTML('beforeend', markup);
+    elements.shoppingList.insertAdjacentHTML('beforeend', markup);
 };
 
 export const deleteItem = id => {
     const item = document.querySelector(`[data-itemid="${id}"]`);
     item.parentElement.removeChild(item);
+};
+
+export const deleteAllItems = () => {
+    elements.clearList.nextElementSibling.innerHTML = '';
+};
+
+export const toggleClearAll = numItems => {
+    elements.clearList.style.visibility = numItems > 0 ? 'visible' : 'hidden';
 };

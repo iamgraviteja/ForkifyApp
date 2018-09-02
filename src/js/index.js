@@ -16,7 +16,6 @@ import * as likesView from './views/likesView';
  * - Liked recipes
  */
 const state = {};
-
 /**
  * SEARCH CONTROLLER
  */
@@ -118,9 +117,12 @@ const listControl = () => {
         const item = state.list.addItem(el.count, el.unit, el.ingredient);
         listView.renderItem(item);
     });
+
+    //Toggle clear all shopping list.
+    listView.toggleClearAll(state.list.getNumItems());
 };
 
-elements.shopping.addEventListener('click', e => {
+elements.shoppingList.addEventListener('click', e => {
     const ID = e.target.closest('.shopping__item').dataset.itemid;
 
     if (e.target.matches('.shopping__delete,.shopping__delete *')) {
@@ -137,6 +139,18 @@ elements.shopping.addEventListener('click', e => {
         }
     }
 
+});
+
+elements.shopping.addEventListener('click', e => {
+    if (e.target.matches('.clear-list')) {
+
+        //remove items from state
+        state.list.removeAllItems();
+
+        //remove items from UI
+        listView.deleteAllItems();
+    }
+    listView.toggleClearAll(state.list.getNumItems());
 });
 
 /**
@@ -181,6 +195,7 @@ const likesControl = () => {
 //Persistent Likes in localStorage
 window.addEventListener('load', () => {
     state.likes = new Likes();
+    state.list = new List();
 
     //render likes from localStorage
     state.likes.readStorage();
@@ -190,6 +205,9 @@ window.addEventListener('load', () => {
 
     //Render the likes from storage
     state.likes.likes.forEach(like => likesView.addLikeToList(like));
+
+    //Toggle clear all Ingredients
+    listView.toggleClearAll(state.list.getNumItems());
 
 });
 

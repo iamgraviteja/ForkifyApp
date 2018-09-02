@@ -20,7 +20,15 @@ export default class List {
         this.items.splice(i, 1);
     }
 
+    removeAllItems() {
+        this.items = [];
+    }
+
     updateCount(id, newCount) {
         this.items.find(el => el.id === id).count = newCount;
+    }
+
+    getNumItems() {
+        return this.items.length;
     }
 }
